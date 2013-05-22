@@ -337,7 +337,7 @@ def maintenance(bot=None):
 			[u'[[%s]]' % x.template.params[u'article'] for x in dykc_page.entries if not x.broken and not x.removed]
 		))
 
-def main(debug=False):
+def main(debug=False, error_log=None):
 	bot = getSite('zh', 'wikipedia', 'bot', apiErrorAutoRetries=10, httpErrorAutoRetries=50)
 	sysop = getSite('zh', 'wikipedia', 'sysop', apiErrorAutoRetries=10, httpErrorAutoRetries=50)
 	dyk = sysop(u'Template:Dyk')
@@ -520,14 +520,12 @@ def main(debug=False):
 				entry.removed = True
 		else:
 			# TODO: notify community
-			error_log = open('/home/liangent/code/bots/updatedyk/error.log', 'a')
-			print >>error_log, 'NO_NEW_ENTRY',
-			if no_type:
-				print >>error_log, 'NO_TYPE',
-			if no_img:
-				print >>error_log, 'NO_IMG',
-			print >>error_log
-			error_log.close()
+			if error_log:
+				print >>error_log, 'NO_NEW_ENTRY',
+				if no_type:
+					print >>error_log, 'NO_TYPE',
+				if no_img:
+					print >>error_log, 'NO_IMG',
 			# Reset recent update
 			recent += Revision(u'')
 		if debug:
