@@ -11,6 +11,7 @@ import re
 import traceback
 
 DELTA = timedelta(hours=8)
+DELTA_PREC = timedelta(minutes=10)
 STAGES = [
 	timedelta(days=-1),
 	timedelta(days=4),
@@ -356,8 +357,6 @@ def main(debug=False, error_log=None):
 		DELTA = timedelta(hours=3)
 	if dykc_page.count > 16:
 		DELTA = timedelta(hours=2)
-	#if dykc_page.count > 6:
-	#	DELTA = timedelta(hours=4)
 	# Confirm recent update time
 	recent_cont = recent.current.content
 	recent_datetime = sign_re.match(recent_cont)
@@ -370,7 +369,7 @@ def main(debug=False, error_log=None):
 		except ValueError:
 			recent_datetime = 'ValueError'
 		else:
-			if now - recent_datetime < DELTA:
+			if now - recent_datetime + DELTA_PREC < DELTA:
 				do_update = False
 	if debug:
 		print 'prev, do_update:', recent_datetime, do_update
