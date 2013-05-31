@@ -338,6 +338,23 @@ def maintenance(bot=None):
 			[u'[[%s]]' % x.template.params[u'article'] for x in dykc_page.entries if not x.broken and not x.removed]
 		))
 
+def hashremoval(dykc, entryhash, debug, error_log, user):
+	if debug:
+		print 'hashremoval', entryhash
+	dykc_cur = dykc.current
+	dykc_cont = dykc_cur.content
+	dykc_page = DYKCPage(dykc_cont, user, clean=True, quick=True)
+	for entry in dykc_page.entries:
+		if entry.broken:
+			continue
+		if entry.hash_str() in entryhash:
+			entry.removed = True
+	dykc_newcont = unicode(dykc_page)
+	try:
+		dykc += Revision(dykc_newcont, base=dykc_cur, bot=True, comment='hashremoval: ' + ', '.join(entryhash))
+	except PageNotSaved:
+		hashremoval(dykc, entryhash, debug, error_log, user)
+
 def main(debug=False, error_log=None):
 	bot = getSite('zh', 'wikipedia', 'bot', apiErrorAutoRetries=10, httpErrorAutoRetries=50)
 	sysop = getSite('zh', 'wikipedia', 'sysop', apiErrorAutoRetries=10, httpErrorAutoRetries=50)
@@ -373,6 +390,7 @@ def main(debug=False, error_log=None):
 				do_update = False
 	if debug:
 		print 'prev, do_update:', recent_datetime, do_update
+	hashremove = []
 	if do_update:
 		# Recent update
 		recent += Revision(u'~~~~~')
@@ -474,6 +492,7 @@ def main(debug=False, error_log=None):
 				talkpage += Revision(talkpage_ncont)
 				# Remove from DYKC page
 				entry.removed = True
+				hashremove.append(entry.hash_str())
 				break
 			else:
 				#continue
@@ -517,6 +536,7 @@ def main(debug=False, error_log=None):
 						appendtext = u'\n\n' + entry.__unicode__(False).strip(),
 					)
 				entry.removed = True
+				hashremove.append(entry.hash_str())
 		else:
 			# TODO: notify community
 			if error_log:
@@ -538,7 +558,7 @@ def main(debug=False, error_log=None):
 	except PageNotSaved:
 		if debug:
 			print '(conflicted)'
-		dykc += Revision(dykc_newcont)
+		hashremoval(dykc, hashremove, debug, error_log, bot)
 
 if __name__ == '__main__':
 	try:
