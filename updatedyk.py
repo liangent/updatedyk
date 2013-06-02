@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from time import time
 import re
 import traceback
+from os import environ
 
 DELTA = timedelta(hours=8)
 DELTA_PREC = timedelta(minutes=10)
@@ -147,6 +148,8 @@ class DYKEntry(object):
 	def check_result(self, site, page, debug):
 		if self.broken:
 			return None
+		if self.hash_str() == environ.get('UPDATEDYK_FORCE'):
+			return True
 		result = self.template.params[u'result']
 		if result.count(u'|') != 2:
 			return None
@@ -377,7 +380,9 @@ def main(debug=False, error_log=None):
 	# Confirm recent update time
 	recent_cont = recent.current.content
 	recent_datetime = sign_re.match(recent_cont)
-	if recent_datetime:
+	if environ.get('UPDATEDYK_FORCE'):
+		recent_datetime = 'ENV_FORCE'
+	elif recent_datetime:
 		try:
 			recent_datetime = datetime(
 				int(recent_datetime.group('year')), int(recent_datetime.group('month')), int(recent_datetime.group('day')),
