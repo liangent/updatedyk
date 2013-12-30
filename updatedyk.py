@@ -147,34 +147,52 @@ class DYKEntry(object):
 	# None = skip
 	def check_result(self, site, page, debug):
 		if self.broken:
+			if debug:
+				print 'check broken'
 			return None
 		if self.hash_str() == environ.get('UPDATEDYK_FORCE'):
+			if debug:
+				print 'check force'
 			return True
 		result = self.template.params[u'result']
 		if result.count(u'|') != 2:
+			if debug:
+				print 'check badresult1'
 			return None
 		try:
 			result, hash, timestamp = result.split(u'|')
 		except ValueError:
+			if debug:
+				print 'check badresult2'
 			return None
 		result = result.strip()
 		hash = hash.strip()
 		if hash != self.hash_str():
+			if debug:
+				print 'check badhash'
 			return None
 		timestamp = timestamp.strip()
 		try:
 			timestamp = datetime.utcfromtimestamp(int(timestamp))
 		except ValueError:
+			if debug:
+				print 'check badts'
 			return None
 		curstage, curdiff = self.get_ts_stage()
 		tagstage, tagdiff = self.get_ts_stage(timestamp)
 		if debug:
 			print 'stage: cur', curdiff, curstage, 'tag', tagdiff, tagstage
 		if result not in (u'+', u'-'):
+			if debug:
+				print 'check unkresult'
 			return None
 		if result == u'+' and curstage <= tagstage:
+			if debug:
+				print 'check badstage+'
 			return None
 		if result == u'-' and tagstage + 1 < len(STAGES):
+			if debug:
+				print 'check badstage-'
 			return None
 		apires = site._apiRequest(
 			action = 'query',
@@ -186,9 +204,13 @@ class DYKEntry(object):
 			rvstart = timestamp.strftime('%Y%m%d%H%M%S'),
 		)['query']['pages'].values()[0]
 		if 'revisions' not in apires:
+			if debug:
+				print 'check norev'
 			return None
 		apires = apires['revisions'][0]
 		if u'%s|%s' % (result, hash) not in apires.get('comment', u''):
+			if debug:
+				print 'check badcomment'
 			return None
 		# Validate sysop right
 		apires = site._apiRequest(
@@ -198,10 +220,14 @@ class DYKEntry(object):
 			usprop = 'groups',
 		)['query']['users'][0]
 		if u'sysop' in apires.get('groups', []):
+			if debug:
+				print 'check pass'
 			if result == u'+':
 				return True
 			else:
 				return False
+		if debug:
+			print 'check baduser'
 		return None
 
 class DYKCPage(object):
