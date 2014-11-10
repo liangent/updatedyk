@@ -182,7 +182,7 @@ class DYKEntry(object):
 		tagstage, tagdiff = self.get_ts_stage(timestamp)
 		if debug:
 			print 'stage: cur', curdiff, curstage, 'tag', tagdiff, tagstage
-		if result not in (u'+', u'-'):
+		if result not in (u'+', u'-', u'*', u'!'):
 			if debug:
 				print 'check unkresult'
 			return None
@@ -222,7 +222,7 @@ class DYKEntry(object):
 		if u'sysop' in apires.get('groups', []):
 			if debug:
 				print 'check pass'
-			if result == u'+':
+			if result in (u'+', u'*'):
 				return True
 			else:
 				return False
