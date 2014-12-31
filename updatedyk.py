@@ -364,7 +364,8 @@ def maintenance(bot=None):
 		maintenance(bot)
 	else:
 		dykclist += Revision(u'－'.join(
-			[u'[[%s]]' % x.template.params[u'article'] for x in dykc_page.entries if not x.broken and not x.removed]
+			[u'[[Wikipedia:新条目推荐/候选#%(a)s|%(a)s]]' % {'a': x.template.params[u'article']}
+				for x in dykc_page.entries if not x.broken and not x.removed]
 		))
 
 def hashremoval(dykc, entryhash, debug, error_log, user):
