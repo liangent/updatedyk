@@ -259,7 +259,8 @@ class DYKCPage(object):
 			if entry.template.params[u'article'] not in articles:
 				articles.add(entry.template.params[u'article'])
 			else:
-				entry.template.params[u'result'] = u''
+				if entry.check_result(site, u'Wikipedia:新条目推荐/候选', False):
+					entry.template.params[u'result'] = u''
 				entry.template.params[u'bot'] = u'duplicate'
 	
 	def __unicode__(self):
