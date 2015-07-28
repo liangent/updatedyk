@@ -434,7 +434,11 @@ def main(debug=False, error_log=None):
 		# Check entries one by one
 		no_type = False
 		no_img = False
-		for entry in reversed(dykc_page.entries):
+		entries = list(reversed(dykc_page.entries))
+		entries.sort(key=lambda entry: not entry.broken and (
+			entry.template.params['result'].startswith('*|') or entry.template.params['result'].startswith('!|')
+		), reverse=True)
+		for entry in entries:
 			# check_result checks passed, rejected, and .broken as well
 			result = entry.check_result(bot, u'Wikipedia:新条目推荐/候选', debug)
 			if debug:
