@@ -489,7 +489,7 @@ def main(debug=False, error_log=None):
 				if debug:
 					print 'author&nom-notify'
 				# Author
-				if entry.template.params['author']:
+				if False and entry.template.params['author']:
 					match = change_template(
 						bot, u'User talk:%s' % entry.template.params['author'], updateddyk_re,
 						lambda m: u'{{UpdatedDYK|%s|%d}}' % (entry.template.params['article'], int(m.group(2)) + 1),
@@ -502,7 +502,7 @@ def main(debug=False, error_log=None):
 							u'{{produceEncouragement|%d}}' % (author_dykcount / 5), None, False,
 						)
 				# Nominator
-				if entry.template.params['nominator'] and entry.template.params['author'] != entry.template.params['nominator']:
+				if False and entry.template.params['nominator'] and entry.template.params['author'] != entry.template.params['nominator']:
 					change_template(
 						bot, u'User talk:%s' % entry.template.params['nominator'], updateddyknom_re,
 						u'{{UpdatedDYKNom|%s}}' % entry.template.params['article'],
