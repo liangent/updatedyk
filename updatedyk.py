@@ -25,7 +25,7 @@ sign_re = re.compile(ur'(?P<year>\d{4})年(?P<month>\d{1,2})月(?P<day>\d{1,2})�
 updateddyk_re = re.compile(ur'\{\{\s*UpdatedDYK\s*\|\s*(.+?)\s*\|\s*(\d+)\s*\}\}', re.IGNORECASE)
 updateddyknom_re = re.compile(ur'\{\{\s*UpdatedDYKNom\s*\|\s*(.+?)\s*\}\}', re.IGNORECASE)
 dykinvite_re = re.compile(ur'\{\{\s*DYK ?Invite\s*\}\}', re.IGNORECASE)
-produce_re = re.compile(ur'\{\{\s*produceEncouragement\s*\|\s*\d+\s*\}\}', re.IGNORECASE)
+produce_re = re.compile(ur'\{\{\s*produceEncouragement\s*\|\s*count\s*=\s*(\d+)\s*\}\}', re.IGNORECASE)
 
 def clean_tail_newsection(text):
 	origtext = text
@@ -490,17 +490,17 @@ def main(debug=False, error_log=None):
 					print 'author&nom-notify'
 				# Author
 				if False and entry.template.params['author']:
-					match = change_template(
-						bot, u'User talk:%s' % entry.template.params['author'], updateddyk_re,
+					change_template(
+                                                bot, u'User talk:%s' % entry.template.params['author'], updateddyk_re,
 						lambda m: u'{{UpdatedDYK|%s|%d}}' % (entry.template.params['article'], int(m.group(2)) + 1),
 						u'{{UpdatedDYK|%s|1}}' % entry.template.params['article'],
 					)
-					author_dykcount = (int(match.group(2)) if match else 0) + 1
-					if author_dykcount % 5 == 0:
-						change_template(
-							bot, u'User:%s' % entry.template.params['author'], produce_re,
-							u'{{produceEncouragement|%d}}' % (author_dykcount / 5), None, False,
-						)
+				if entry.template.params['author']:
+					change_template(
+						bot, u'User:%s' % entry.template.params['author'], produce_re,
+						lambda m: u'{{produceEncouragement|count=%d}}' % (int(m.group(1)) + 1),
+                                                u'{{produceEncouragement|count=1}}', False,
+					)
 				# Nominator
 				if False and entry.template.params['nominator'] and entry.template.params['author'] != entry.template.params['nominator']:
 					change_template(
