@@ -497,7 +497,7 @@ def main(debug=False, error_log=None):
 					)
 				if entry.template.params['author']:
 					change_template(
-						bot, u'User:%s' % entry.template.params['author'], produce_re,
+						sysop, u'User:%s' % entry.template.params['author'], produce_re,
 						lambda m: u'{{produceEncouragement|count=%d}}' % (int(m.group(1)) + 1),
                                                 u'{{produceEncouragement|count=1}}', False,
 					)
